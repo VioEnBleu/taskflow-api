@@ -8,5 +8,17 @@ def root_endpooint():
         "status": "ok"
     }
 
-def hello():
-    print("hello")
+@app.get("/hello")
+def hello_endpoint():
+    return {
+        "message": "Hello, World!"
+    }
+
+@app.get("/snake")
+def snake_endpoint():
+    with open ("snake.html", "r") as file:
+        snake_game = file.read()
+    
+    return {
+        snake_game
+    }

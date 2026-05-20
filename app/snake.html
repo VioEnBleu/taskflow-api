@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serveur de dev des LIT B3 BoC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Empêche le scroll pendant le jeu */
+            height: 100%;
+            background-color: #0f172a;
+        }
+        canvas {
+            display: block;
+        }
+        /* Style pour s'assurer que le texte ne gêne pas les clics si besoin */
+        .pointer-events-none {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center">
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="absolute top-5 left-5 text-white font-mono text-xl z-20">
+        Score: <span id="score">0</span>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        let score = 0;
+        let gameActive = true;
+
+        // Configuration du Canvas
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Le Joueur
+        const player = {
+            x: 100,
+            y: 100,
+            size: 20,
+            speed: 5,
+            color: '#3b82f6',
+            dx: 0,
+            dy: 0
+        };
+
+        // La Cible (le point vert)
+        const target = {
+            x: Math.random() * (canvas.width - 20),
+            y: Math.random() * (canvas.height - 20),
+            size: 15,
+            color: '#22c55e'
+        };
+
+        // Contrôles
+        const keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        function update() {
+            if (keys['ArrowUp'] || keys['KeyW']) player.dy = -player.speed;
+            else if (keys['ArrowDown'] || keys['KeyS']) player.dy = player.speed;
+            else player.dy = 0;
+
+            if (keys['ArrowLeft'] || keys['KeyA']) player.dx = -player.speed;
+            else if (keys['ArrowRight'] || keys['KeyD']) player.dx = player.speed;
+            else player.dx = 0;
+
+            player.x += player.dx;
+            player.y += player.dy;
+
+            // Limites de l'écran
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.size > canvas.width) player.x = canvas.width - player.size;
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.size > canvas.height) player.y = canvas.height - player.size;
+
+            // Collision avec la cible
+            const distX = player.x - target.x;
+            const distY = player.y - target.y;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+
+            if (distance < player.size) {
+                score++;
+                scoreElement.innerText = score;
+                spawnTarget();
+            }
+        }
+
+        function spawnTarget() {
+            target.x = Math.random() * (canvas.width - 30) + 15;
+            target.y = Math.random() * (canvas.height - 30) + 15;
+            
+            // Empêcher la cible d'apparaître pile sous le texte central au début
+            const centerDist = Math.sqrt(Math.pow(target.x - canvas.width/2, 2) + Math.pow(target.y - canvas.height/2, 2));
+            if (centerDist < 100) spawnTarget(); 
+        }
+
+        function draw() {
+            // Effacer le canvas avec un léger effet de traînée
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dessiner la cible
+            ctx.fillStyle = target.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = target.color;
+            ctx.beginPath();
+            ctx.arc(target.x, target.y, target.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dessiner le joueur
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = player.color;
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+            
+            ctx.shadowBlur = 0; // Reset pour ne pas affecter le reste
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
