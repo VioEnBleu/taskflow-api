@@ -4,7 +4,7 @@ app = FastAPI()
 @app.get("/")
 def root_endpooint():
     return {
-        "message": "hello world",
+        "message": "API V2 is up and running",
         "status": "ok"
     }
 
