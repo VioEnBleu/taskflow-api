@@ -26,13 +26,12 @@ jobs:
     
     deploy:
         needs: test
-
         if: github.ref == 'refs/heads/main'
 
         runs-on: ubuntu-latest
 
         steps:
-            - name: Deploy to Render
-              run: curl "$RENDER_DEPLOY_KEY"
-              env:
+          - name: Trigger Render Deploy
+            run: curl "$RENDER_DEPLOY_KEY"
+            env:
                 RENDER_DEPLOY_KEY: ${{ secrets.RENDER_DEPLOY_KEY }}
