@@ -1,0 +1,20 @@
+name: CD-main
+
+on:
+    pull_request:
+        branches: [main]
+    
+    push:
+        branches: [main]
+
+jobs:
+    deploy:
+        if: github.ref == 'refs/heads/main'
+
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Trigger Render Deploy
+          run: curl "$RENDER_DEPLOY_KEY"
+          env: 
+            RENDER_DEPLOY_KEY: ${{ secrets.RENDER_DEPLOY_KEY }}
