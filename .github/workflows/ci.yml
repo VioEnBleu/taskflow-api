@@ -2,10 +2,10 @@ name: CI-CD
 
 on:
     pull_request:
-        branches: [main]
+        branches: [main, dev]
     
     push:
-        branches: [main]
+        branches: [main, dev]
 
 jobs:
     test:
@@ -24,14 +24,4 @@ jobs:
             - run: ruff check .
             - run: pytest
     
-    deploy:
-        needs: test
-        if: github.ref == 'refs/heads/main'
-
-        runs-on: ubuntu-latest
-
-        steps:
-          - name: Trigger Render Deploy
-            run: curl "$RENDER_DEPLOY_KEY"
-            env:
-                RENDER_DEPLOY_KEY: ${{ secrets.RENDER_DEPLOY_KEY }}
+    
