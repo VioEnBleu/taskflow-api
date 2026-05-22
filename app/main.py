@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 app = FastAPI()
 
 @app.get("/")
@@ -19,6 +20,4 @@ def snake_endpoint():
     with open ("snake.html", "r") as file:
         snake_game = file.read()
     
-    return {
-        snake_game
-    }
+    return HTMLResponse(content=snake_game, status_code=200)
